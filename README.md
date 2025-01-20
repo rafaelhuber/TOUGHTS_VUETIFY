@@ -52,6 +52,9 @@ O backend foi desenvolvido como uma API RESTful, possibilitando integração com
 - `POST /toughts/add`: Criar novo pensamento.
 - `PATCH /toughts/:id`: Editar pensamento existente.
 - `DELETE /toughts/:id`: Excluir pensamento.
+- `PATCH /:id/like: Alterna entre adicionar e remover curtidas.
+- `PATCH /:id/commen: Alterna entre adicionar e remover comentários.
+- `GET /:id/comment: Retorna a lista de comentários.
 
 ## Segurança
 
