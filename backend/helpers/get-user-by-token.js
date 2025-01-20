@@ -1,21 +1,31 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-const User = require('../models/User')
-
-// get user by jwt token
-
+// Função para obter o usuário pelo token JWT
 const getUserByToken = async (token) => {
-    if (!token) return res.status(422).json({ error: "Acesso negado!" });
+    try {
+        if (!token) {
+            throw new Error("Acesso negado! Token não fornecido.");
+        }
 
-    // find user
-    const decoded = jwt.verify(token, "nossosecret");
+        // Decodifica o token
+        const decoded = jwt.verify(token, "nossosecret");
+        const userId = decoded.id;
 
-    const userId = decoded.id;
+        // Busca o usuário pelo ID
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            throw new Error("Usuário não encontrado.");
+        }
 
-    const user = await User.findOne({ _id: userId });
-
-    return user;
+        return user;
+    } catch (error) {
+        // Lida com erros relacionados ao token
+        if (error.name === "TokenExpiredError") {
+            throw new Error("O token expirou. Por favor, faça login novamente.");
+        }
+        throw new Error("Token inválido.");
+    }
 };
 
-
-module.exports = getUserByToken
+module.exports = getUserByToken;

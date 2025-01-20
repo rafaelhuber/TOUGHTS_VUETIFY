@@ -11,6 +11,7 @@ export const useAuth = defineStore('auth', {
     // Estado da autenticação, recuperando valores do localStorage ou definindo valores padrão
     token: localStorage.getItem('token') || '', // Armazena o token de autenticação
     name: localStorage.getItem('name') || '',   // Armazena o nome do usuário
+    userId: localStorage.getItem('userId') || '', // Armazena o nome do usuário
     isAuth: false,                              // Status de autenticação, inicialmente falso
   }),
 
@@ -34,6 +35,11 @@ export const useAuth = defineStore('auth', {
       this.name = nameValue; // Atualiza o estado do nome
     },
 
+    setUserId(userIdValue) {
+      localStorage.setItem('userId', userIdValue); // Armazena o nome no localStorage
+      this.userId = userIdValue; // Atualiza o estado do nome
+    },
+
     // Método para atualizar o status de autenticação
     setIsAuth(auth) {
       this.isAuth = auth; // Atualiza o estado de autenticação
@@ -42,11 +48,12 @@ export const useAuth = defineStore('auth', {
     async login(email, password) {
       try {
         const response = await http.post('users/login', { email, password });
-        console.log('Token recebido:', response.data.token);
+        //console.log('Token recebido:', response.data.token);
         this.setToken(response.data.token); // Armazena o token
         this.setUser(response.data.name);   // Armazena o nome
+        this.setUserId(response.data.userId);
         this.setIsAuth(true);
-        console.log('Login bem-sucedido:', response.data);
+        //console.log('Login bem-sucedido:', response.data);
         if (this.isAuth) {
           router.push('/')
         }
@@ -54,6 +61,8 @@ export const useAuth = defineStore('auth', {
         console.error('Erro ao fazer login:', error);
         return error
       }
+
+
     },
 
     async register(name, email, password, confirmpassword) {

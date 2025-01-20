@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Pensamentos</h1>
+    <h1 class="d-flex justify-center">Meus Pensamentos</h1>
 
     <v-card 
       v-for="(x, index) in pensamentos" :key="index"

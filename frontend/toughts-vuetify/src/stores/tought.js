@@ -27,7 +27,7 @@ export const useToughts = defineStore('tought', {
                         }
                     }
                 );
-                console.log('Publicação criada:', response.data);
+
 
                 // Redireciona o usuário
                 router.push('/Pensamento');
@@ -55,7 +55,6 @@ export const useToughts = defineStore('tought', {
                         }
                     }
                 );
-                console.log('Meus Pensamentos:', response.data);
                 // Adiciona o pensamento ao estado local
                 this.toughts.push(response.data);
                 // Redireciona o usuário
@@ -91,7 +90,6 @@ export const useToughts = defineStore('tought', {
                         }
                     }
                 );
-
                 return { success: true };
             } catch (error) {
                 console.log(error);
@@ -113,13 +111,82 @@ export const useToughts = defineStore('tought', {
                         }
                     }
                 );
-
-
                 return { success: true };;
             } catch (error) {
                 console.log(error);
                 return error
             }
-        }
+        },
+
+        async getLike(id) {
+            const auth = useAuth();
+            const token = auth.token;
+            try {
+                auth.checkToken();
+                const response = await http.patch(
+                    `toughts/${id}/like`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}` // Adiciona o token ao cabeçalho
+                        }
+                    }
+                );
+                return { data: response.data };
+            } catch (error) {
+                console.log(error);
+                return error
+            }
+        },
+
+        async publicComment(id, commentText) {
+            const auth = useAuth();
+            const token = auth.token;
+
+
+            try {
+                auth.checkToken();
+                const response = await http.patch(
+                    `toughts/${id}/comment`,
+                    { commentText },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}` // Adiciona o token ao cabeçalho
+                        }
+                    }
+                );
+                console.log('response', response);
+
+                return { data: response.data };
+            } catch (error) {
+                console.log(error);
+                return error
+            }
+        },
+
+        async getComments(id) {
+            const auth = useAuth();
+            const token = auth.token;
+            try {
+                auth.checkToken();
+                const response = await http.get(
+                    `toughts/${id}/comment`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}` // Adiciona o token ao cabeçalho
+                        }
+                    }
+                );
+                // Adiciona o pensamento ao estado local
+                return { data: response.data };
+
+
+            } catch (error) {
+                console.log(error);
+                return error
+            }
+        },
+
     },
 });

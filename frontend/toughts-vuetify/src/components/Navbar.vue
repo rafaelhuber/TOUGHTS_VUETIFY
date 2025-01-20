@@ -1,8 +1,13 @@
 <template >
   
-    <v-app-bar app color="black">
+    <v-app-bar app color="black" >
       <!-- Logo ou Título -->
-      <v-toolbar-title>Minha Navbar</v-toolbar-title>
+      <v-toolbar-title>
+        <router-link to="/" style="color: #ff8c00">
+          <v-img :width="50" aspect-ratio="1/1" cover src="../assets/logo.png"></v-img>
+        </router-link>
+
+      </v-toolbar-title>
       <!-- Espaçamento para empurrar os botões -->
       <v-spacer></v-spacer>
 
