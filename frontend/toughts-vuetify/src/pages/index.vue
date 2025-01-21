@@ -18,7 +18,7 @@
           <v-btn
           variant="plain"
           v-ripple="false"
-            :color="post.liked ? 'red' : 'white'"
+            :color="post.liked ? 'red' : 'grey-lighten-1'"
             @click="toggleLike(post)"
           >
             <v-icon size="x-large">
@@ -26,7 +26,26 @@
             </v-icon>
             {{ post.likesCount }}
           </v-btn>
-          <comment-section :post-id="post._id" />          
+       
+
+          
+          
+          <div class="pa-4 text-center">
+            <v-icon icon="mdi-comment-outline" @click="openDialog(post._id)"></v-icon>
+      <v-dialog v-model="dialog" max-width="480">
+        <v-card title="Comentários">
+          <template v-slot:text>
+            <comment-section :post-id="post._id" @update-comments="fetchPensamentos" />
+          </template>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text="Fechar" variant="text" @click="dialog = false"></v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+          </div>
+          <p>{{ post.commentCount }}</p>
         </v-card-actions>
       </v-card>
     </v-container>
@@ -47,14 +66,21 @@ export default {
     const toughtStore = useToughts();
     const auth = useAuth();
     const pensamentos = ref([]); // Armazena os pensamentos
+    const dialog = ref(false)
 
+
+const selectedPostId = ref(null);
+
+const openDialog = (postId) => {
+  selectedPostId.value = postId; // Armazena o ID do post selecionado
+  dialog.value = true;
+  fetchPensamentos();
+}
     // Carrega os pensamentos do backend
     const fetchPensamentos = async () => {
       try {
         const response = await toughtStore.showTought();
-        console.log('Pensamentos._id',pensamentos);
         
-
         if (response.success) {
           pensamentos.value = response.data.toughts.map((tought) => ({
             _id: tought._id,
@@ -64,6 +90,7 @@ export default {
             name: tought.user?.name, // Nome do usuário
             liked: tought.likes.includes(auth.userId),
             likesCount: tought.likes.length,
+            commentCount: tought.comments.length
           }));
         }
       } catch (error) {
@@ -97,6 +124,8 @@ export default {
       pensamentos,
       toggleLike,
       auth,
+      dialog,
+      openDialog
     };
   },
 };

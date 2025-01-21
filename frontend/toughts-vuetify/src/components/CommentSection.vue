@@ -3,8 +3,9 @@
       <v-card-title>Comentários</v-card-title>
   
       <!-- Campo de Comentário -->
-    <v-textarea v-model="newComment" label="Adicionar um comentário..." rows="2" outlined dense auto-grow></v-textarea>
+    <v-textarea v-model="newComment" label="Adicionar um comentário..." rows="1" outlined dense auto-grow></v-textarea>
   
+    
       <!-- Botão para Enviar Comentário -->
       <v-btn color="primary" @click="submitComment" :disabled="newComment.trim() === ''">
         Publicar
@@ -13,15 +14,18 @@
       <!-- Lista de Comentários -->
       <v-divider></v-divider>
       <v-list>
-        <v-list-item-group v-if="comments.length">
-          <v-list-item v-for="(comment, index) in comments" :key="index">
-            <v-list-item-content>
-              <v-list-item-title>{{ comment.name }}:</v-list-item-title>
-
-              <v-list-item-subtitle>{{ comment.text }}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
+        
+        <v-list v-if="comments && comments.length">
+          <v-list-item-group>
+            <v-list-item v-for="(comment, index) in comments" :key="index">
+              <v-list-item-content v-if="comment">
+                <v-list-item-title>{{ comment.name }}</v-list-item-title>
+                <v-list-item-subtitle>{{ comment.text }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+       
         <v-list-item v-else>
           <v-list-item-content>
             <v-list-item-subtitle>Nenhum comentário ainda.</v-list-item-subtitle>
@@ -34,6 +38,10 @@
   <script>
   import { ref, onMounted } from 'vue';
   import { useToughts } from "@/stores/tought.js";
+  import { defineEmits } from 'vue';
+
+  const emit = defineEmits(['update-comments']);
+
   
   export default {
     props: {
@@ -47,7 +55,9 @@
   
       const newComment = ref('');
       const comments = ref([]);
-  
+      
+      
+
       // Método para enviar o comentário
       const submitComment = async () => {
         if (newComment.value.trim() === '') return;
@@ -59,7 +69,9 @@
             
           // Adiciona o comentário localmente (se o backend retornar o comentário criado)
           comments.value.push(response.data.comment);
-  
+          
+          await fetchComments();
+          
           // Limpa o campo de comentário
           newComment.value = '';
         } catch (error) {
@@ -72,9 +84,8 @@
         try {
             
             const response = await toughtStore.getComments(props.postId);
-            console.log('Buscando comentários para o postId:', response);
-            
-            
+            console.log('response...........',response.data.comments);
+                        
             if (response.data.comments.length === 0) {
             comments.value = [];
             } else {
@@ -95,7 +106,7 @@
       return {
         newComment,
         comments,
-        submitComment
+        submitComment,
       };
     }
   };
